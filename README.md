@@ -1,16 +1,11 @@
-# ringo
+# Ringo pocket refeee
 
-A new Flutter project.
+Multiplatform application to help ringo referees in their next ringo game.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Platforms
+App is available to on all major platforms
+- Android (stable and tested)
+- IOS 
+- Windows (stable and tested)
+- MacOS
+- And even Linux (currently not supported)
