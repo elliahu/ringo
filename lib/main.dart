@@ -8,10 +8,8 @@ void main() {
   runApp(const MyApp());
 }
 
-SnackBar createInfoSnackbar(String message){
-  return SnackBar(
-    content: Text(message)
-  );
+SnackBar createInfoSnackbar(String message) {
+  return SnackBar(content: Text(message));
 }
 
 //radius
@@ -28,11 +26,7 @@ const grayColor = Color(0xFFCED0CE);
 const complementColor = Color(0xFFC1CDF9);
 const shadowColor = Color(0XFF999797);
 const boxShadow = BoxShadow(
-  color: shadowColor,
-  offset: Offset(0,0),
-  blurRadius: 15,
-  spreadRadius: -3
-);
+    color: shadowColor, offset: Offset(0, 0), blurRadius: 15, spreadRadius: -3);
 
 const primaryGradient = [
   Color(0xFF5fd1f9),
@@ -41,7 +35,15 @@ const primaryGradient = [
 ];
 
 //dummy data
-final _teamSelection = ['Zelení','Červení','Modří','Oranžoví','Žlutí','Hnědí','Fialoví'];
+final _teamSelection = [
+  'Zelení',
+  'Červení',
+  'Modří',
+  'Oranžoví',
+  'Žlutí',
+  'Hnědí',
+  'Fialoví'
+];
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -56,26 +58,21 @@ class MyAppSate extends State<MyApp> {
 
   List<Match> matches = [];
 
-  static const List<Widget> _pages = <Widget>[
-    HomePage(), 
-    MatchCreator()
-  ];    
+  static const List<Widget> _pages = <Widget>[HomePage(), MatchCreator()];
 
   @override
   Widget build(BuildContext context) {
-
     Match.readData().then((value) => matches = value);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() => _selectedIndex = index);
-            },
-            children: _pages,
-
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() => _selectedIndex = index);
+          },
+          children: _pages,
         ),
         extendBody: false,
         bottomNavigationBar: BottomNavigationBar(
@@ -127,144 +124,169 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   List<Match> activeMatches = [];
   List<Match> finishedMatches = [];
 
-  void refreshUi(){
-      Match.readData().then((value){
-        setState(() {
-        activeMatches = value.where((element) => element.finished! == 'false').toList();
-        finishedMatches = value.where((element) => element.finished! == 'true').toList();
+  void refreshUi() {
+    Match.readData().then((value) {
+      setState(() {
+        activeMatches =
+            value.where((element) => element.finished! == 'false').toList();
+        finishedMatches =
+            value.where((element) => element.finished! == 'true').toList();
         print('refreshing');
-        });
       });
+    });
   }
 
-  Future<List<Match>> getDataAsync(){
+  Future<List<Match>> getDataAsync() {
     return Match.readData();
+  }
+
+  void showSettings() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return DraggableScrollableSheet(
+          expand: false,
+          builder: (_, controller) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: whiteColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(borderRadius),
+                  topRight: Radius.circular(borderRadius),
+                ),
+              ),
+              child: SettingsPage(
+                notifyParent: refreshUi,
+              ),
+            );
+          },
+        );
+      },
+    ).then((value) => refreshUi());
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: getDataAsync(),
-      builder: (BuildContext context,AsyncSnapshot snapshot){
-        if(snapshot.connectionState != ConnectionState.done){
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return Container(); // your widget while loading
         }
 
-        if(!snapshot.hasData){
+        if (!snapshot.hasData) {
           return Container(); //your widget when error happens
         }
 
-        activeMatches = snapshot.data.where((element) => element.finished! == 'false').toList(); 
-        finishedMatches = snapshot.data.where((element) => element.finished! == 'true').toList(); //your Map<String,dynamic>
+        activeMatches = snapshot.data
+            .where((element) => element.finished! == 'false')
+            .toList();
+        finishedMatches = snapshot.data
+            .where((element) => element.finished! == 'true')
+            .toList(); //your Map<String,dynamic>
 
         return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              padding: const EdgeInsets.only(
-                  left: 30, top: 75, right: 25, bottom: 40),
-              child: Text(
-                'Welcome\nback !',
-                style: GoogleFonts.comfortaa(
-                    fontSize: 50,
-                    fontWeight: FontWeight.w900,
-                    height: 0.9,
-                    color: whiteColor),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.only(right: 30, top: 5),
-              child: IconButton(
-                icon: const Icon(Icons.settings),
-                color: whiteColor,
-                iconSize: 35,
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) {
-                      return DraggableScrollableSheet(
-                        expand: false,
-                        builder: (_, controller) {
-                          return Container(
-                              decoration: const BoxDecoration(
-                                  color: whiteColor,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(borderRadius),
-                                      topRight: Radius.circular(borderRadius))),
-                              child: SettingsPage(
-                                notifyParent: refreshUi,
-                          ));
-                        },
-                      );
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(
+                      left: 30, top: 75, right: 25, bottom: 40),
+                  child: Text(
+                    'Welcome\nback !',
+                    style: GoogleFonts.comfortaa(
+                        fontSize: 40,
+                        fontWeight: FontWeight.w900,
+                        height: 0.9,
+                        color: whiteColor),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(right: 30, top: 5),
+                  child: IconButton(
+                    icon: const Icon(Icons.settings),
+                    color: whiteColor,
+                    iconSize: 35,
+                    onPressed: () {
+                      showSettings();
                     },
-                  ).then((value) => refreshUi());
-                },
-              ),
-            )
-          ],
-        ),
-        Expanded(
-          child: Container(
-              decoration: const BoxDecoration(
+                  ),
+                )
+              ],
+            ),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
                   color: whiteColor,
                   borderRadius: BorderRadius.only(
                     topRight: Radius.circular(borderRadius),
                     topLeft: Radius.circular(borderRadius),
-                  )),
-              padding: const EdgeInsets.only(left: 0, right: 0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.only(
-                          left: 20, top: 25, right: 0, bottom: 18),
-                      child: const Heading(
-                        text: 'Active matches',
-                      ),
-                    ),
-                    Container(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: (activeMatches.length > 0)? Row(children: activeMatches
-                        .map((e) => ActiveMatchCard(match: e,afterCallback: ()=>refreshUi(),)).toList()): 
-                        Container(
-                          margin: const EdgeInsets.all(15),
-                          child: Text('Tere are currently no active matches'),
-                        ),
-                      ),
-                    ),
-                    Container(
+                  ),
+                ),
+                padding: const EdgeInsets.only(left: 0, right: 0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
                         padding: const EdgeInsets.only(
                             left: 20, top: 25, right: 0, bottom: 18),
                         child: const Heading(
-                          text: 'Recent results',
-                        )),
-                    Column(
-                      children: finishedMatches.length > 0 ? finishedMatches
-                      .map((e) => MatchCard(match: e)).toList() :
-                      [Container(
-                          margin: const EdgeInsets.all(15),
-                          child: Text('Tere are currently no match results'),
-                        ),]
-                    ),
-                  ],
+                          text: 'Active matches',
+                        ),
+                      ),
+                      Container(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: (activeMatches.length > 0)
+                              ? Row(
+                                  children: activeMatches
+                                      .map((e) => ActiveMatchCard(
+                                            match: e,
+                                            afterCallback: () => refreshUi(),
+                                          ))
+                                      .toList())
+                              : Container(
+                                  margin: const EdgeInsets.all(15),
+                                  child: Text(
+                                      'Tere are currently no active matches'),
+                                ),
+                        ),
+                      ),
+                      Container(
+                          padding: const EdgeInsets.only(
+                              left: 20, top: 25, right: 0, bottom: 18),
+                          child: const Heading(
+                            text: 'Recent results',
+                          )),
+                      Column(
+                        children: finishedMatches.length > 0
+                            ? finishedMatches
+                                .map((e) => MatchCard(match: e))
+                                .toList()
+                            : [
+                                Container(
+                                  margin: const EdgeInsets.all(15),
+                                  child: Text(
+                                      'Tere are currently no match results'),
+                                ),
+                              ],
+                      ),
+                    ],
+                  ),
                 ),
-              )),
-        )
-      ],
-    );
+              ),
+            )
+          ],
+        );
       },
     );
-    
   }
 }
 
@@ -278,11 +300,11 @@ class MatchCard extends StatelessWidget {
     return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(15),
-        margin: const EdgeInsets.only(left: 8,right: 8),
+        margin: const EdgeInsets.only(left: 8, right: 8,bottom: 8),
         decoration: BoxDecoration(
-            color: whiteColor,
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: grayColor, width: 1),
+          color: whiteColor,
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(color: grayColor, width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -308,8 +330,8 @@ class MatchCard extends StatelessWidget {
             Expanded(
                 child: Text(
               match.teamTwo!,
-              style:
-                  GoogleFonts.comfortaa(fontWeight: FontWeight.w600, fontSize: 20),
+              style: GoogleFonts.comfortaa(
+                  fontWeight: FontWeight.w600, fontSize: 20),
               textAlign: TextAlign.center,
             ))
           ],
@@ -318,8 +340,9 @@ class MatchCard extends StatelessWidget {
 }
 
 class ActiveMatchCard extends StatelessWidget {
-  ActiveMatchCard({Key? key, required this.match,required  this.afterCallback}) : super(key: key);
-  
+  ActiveMatchCard({Key? key, required this.match, required this.afterCallback})
+      : super(key: key);
+
   final Match match;
   VoidCallback afterCallback;
 
@@ -327,52 +350,50 @@ class ActiveMatchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context,
-              MaterialPageRoute(builder: (context) => MatchPage(match:match, notifyParent: (){}))).then((value) => afterCallback());
+        Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        MatchPage(match: match, notifyParent: () {})))
+            .then((value) => afterCallback());
       },
       child: Container(
-        width: 250,
-        height: 300,
-          padding: const EdgeInsets.only(left: 25,bottom: 7),
-          margin: const EdgeInsets.only(left: 8,right: 8,top: 16,bottom:16),
+          width: 220,
+          height: 300,
+          padding: const EdgeInsets.only(left: 15, bottom: 15),
+          margin: const EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 16),
           decoration: BoxDecoration(
               gradient: const LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: primaryGradient
-              ),
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: primaryGradient),
               borderRadius: BorderRadius.circular(borderRadius),
-              boxShadow: const [boxShadow]
-          ),
+              boxShadow: const [boxShadow]),
           child: Container(
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(right: 25,bottom: 0),
-                alignment: Alignment.center,
-                child:const Icon(
-                  Icons.play_arrow_rounded,
-                  color: Color(0x50FFFFFF),
-                  size: 200,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Color(0x50FFFFFF),
+                    size: 200,
+                  ),
                 ),
-              ),
-              Text(
-                '${match.teamOne}\n${match.teamTwo}',
-                style: GoogleFonts.comfortaa(
-                  fontSize: 26,
-                  color: whiteColor,
-                  fontWeight: FontWeight.w900,
-                  height: 1.3
+                Text(
+                  '${match.teamOne}\n${match.teamTwo}',
+                  style: GoogleFonts.comfortaa(
+                      fontSize: 26,
+                      color: whiteColor,
+                      fontWeight: FontWeight.w900,
+                      height: 1.3),
                 ),
-              ),
-              
-            ],
-          ),
-          )
-      ),
+              ],
+            ),
+          )),
     );
   }
 }
@@ -405,18 +426,28 @@ class SettingsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Heading(text: 'App Settings'),
-            const Text('Settings are saved automatically and will be synchronized once the settings page is closed'),
-            Padding(padding: const EdgeInsets.only(top: 15,bottom: 15),
-              child:SecondaryButton(text: 'Delete all saved data', onTap: (){
-              Match.deleteSavedData().then((value) => (){
-                print('deleting');
-                notifyParent();
-              });
-            }),),
-            Padding(padding: const EdgeInsets.only(top: 15,bottom: 15),
-            child: SecondaryButton(text: 'Test message', onTap: (){
-              ScaffoldMessenger.of(context).showSnackBar(createInfoSnackbar('Hello world'));
-            }),)           
+            const Text(
+                'Settings are saved automatically and will be synchronized once the settings page is closed'),
+            Padding(
+              padding: const EdgeInsets.only(top: 15, bottom: 15),
+              child: SecondaryButton(
+                  text: 'Delete all saved data',
+                  onTap: () {
+                    Match.deleteSavedData().then((value) => () {
+                          print('deleting');
+                          notifyParent();
+                        });
+                  }),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 15, bottom: 15),
+              child: SecondaryButton(
+                  text: 'Test message',
+                  onTap: () {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(createInfoSnackbar('Hello world'));
+                  }),
+            )
           ],
         ));
   }
@@ -438,14 +469,11 @@ class _MatchCreatorState extends State<MatchCreator> {
 
   @override
   Widget build(BuildContext context) {
-
-    for(String team in _teamSelection){
-      _dropDownMenuItems.add(
-        DropdownMenuItem(
-          value: team,
-          child:  Text(team),
-        )
-      );
+    for (String team in _teamSelection) {
+      _dropDownMenuItems.add(DropdownMenuItem(
+        value: team,
+        child: Text(team),
+      ));
     }
 
     return Scaffold(
@@ -467,77 +495,76 @@ class _MatchCreatorState extends State<MatchCreator> {
             Container(
               padding: const EdgeInsets.all(15),
               child: Container(
-                child:Column(
+                  child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       DecoratedBox(
-                        decoration: const BoxDecoration(
-                          color: whiteColor,
-                          borderRadius: BorderRadius.all(Radius.circular(borderRadius))
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.only(left: 20,top: 8,bottom: 8,right: 20),
-                          child: DropdownButton<String>(
-                            underline: Container(),
-                            value: _teamOneSelected,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _teamOneSelected = newValue!;
-                                match.teamOne = _teamOneSelected;
-                              });
-                            },
-                            items: _teamSelection
-                                .map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value)
-                                  );
-                                }).toList(),
-                            style: GoogleFonts.comfortaa(color: Colors.black, fontSize: 20),
-                          ),
-                        )
-                      ),
+                          decoration: const BoxDecoration(
+                              color: whiteColor,
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(borderRadius))),
+                          child: Container(
+                            padding: const EdgeInsets.only(
+                                left: 10, top: 8, bottom: 8, right: 10),
+                            child: DropdownButton<String>(
+                              underline: Container(),
+                              value: _teamOneSelected,
+                              icon: const Icon(Icons.arrow_drop_down),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _teamOneSelected = newValue!;
+                                  match.teamOne = _teamOneSelected;
+                                });
+                              },
+                              items: _teamSelection
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                return DropdownMenuItem<String>(
+                                    value: value, child: Text(value));
+                              }).toList(),
+                              style: GoogleFonts.comfortaa(
+                                  color: Colors.black, fontSize: 20),
+                            ),
+                          ),),
                       Text(
                         'vs.',
                         style: GoogleFonts.comfortaa(
-                          fontSize:26,color: whiteColor
-                        ),
+                            fontSize: 26, color: whiteColor),
                       ),
                       DecoratedBox(
-                        decoration: const BoxDecoration(
-                          color: whiteColor,
-                          borderRadius: BorderRadius.all(Radius.circular(borderRadius))
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.only(left: 20,top: 8,bottom: 8,right: 20),
-                          child: DropdownButton<String>(
-                            underline: Container(),
-                            value: _teamTwoSelected,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _teamTwoSelected = newValue!;
-                                match.teamTwo = _teamTwoSelected;
-                              });
-                            },
-                            items: _teamSelection
-                                .map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                            style: GoogleFonts.comfortaa(color: Colors.black, fontSize: 20),
-                          ),
-                        )
-                      ),
+                          decoration: const BoxDecoration(
+                              color: whiteColor,
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(borderRadius))),
+                          child: Container(
+                            padding: const EdgeInsets.only(
+                                left: 10, top: 8, bottom: 8, right: 10),
+                            child: DropdownButton<String>(
+                              underline: Container(),
+                              value: _teamTwoSelected,
+                              icon: const Icon(Icons.arrow_drop_down),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _teamTwoSelected = newValue!;
+                                  match.teamTwo = _teamTwoSelected;
+                                });
+                              },
+                              items: _teamSelection
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              style: GoogleFonts.comfortaa(
+                                  color: Colors.black, fontSize: 20),
+                            ),
+                          ),),
                     ],
                   ),
-                  
-                  
                   const SizedBox(height: 10),
                   SwitchListTile(
                     activeColor: whiteColor,
@@ -552,7 +579,7 @@ class _MatchCreatorState extends State<MatchCreator> {
                     value: match.allowOvertime! == "true",
                     onChanged: (bool value) {
                       setState(() {
-                        match.allowOvertime = (value)? "true": "false";
+                        match.allowOvertime = (value) ? "true" : "false";
                       });
                     },
                   ),
@@ -562,20 +589,21 @@ class _MatchCreatorState extends State<MatchCreator> {
                       match.teamOne = _teamOneSelected;
                       match.teamTwo = _teamTwoSelected;
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                MatchPage(match: match,
-                                  notifyParent: (){},
-                                ),
-                      )).then((value){setState(() {});});
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MatchPage(
+                              match: match,
+                              notifyParent: () {},
+                            ),
+                          )).then((value) {
+                        setState(() {});
+                      });
                     },
                     child: const MainButton(
                         text: 'Start the match', icon: Icons.arrow_forward),
                   )
                 ],
-              )
-              ),
+              )),
             )
           ],
         ));
@@ -634,12 +662,11 @@ class SecondaryButton extends StatelessWidget {
           decoration: const BoxDecoration(
               color: primaryDarkColor,
               borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
-              boxShadow: [boxShadow]
-          ),
+              boxShadow: [boxShadow]),
           child: Text(
             text,
-            style:
-                GoogleFonts.comfortaa(fontSize: 20, fontWeight: FontWeight.w900,color: whiteColor),
+            style: GoogleFonts.comfortaa(
+                fontSize: 20, fontWeight: FontWeight.w900, color: whiteColor),
           ),
         ));
   }
@@ -673,27 +700,30 @@ class _MatchPageState extends State<MatchPage> {
     content: Text("It's time to rotate players"),
   );
 
-  void incerementNumberOfRound(){
-    if((widget.match.score![0] + widget.match.score![1]) % 3 == 0){
+  void incerementNumberOfRound() {
+    if ((widget.match.score![0] + widget.match.score![1]) % 3 == 0) {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
-  void _checkForWin(){
-    if(widget.match.isWin){
-      String team = (widget.match.score![0] > widget.match.score![1])? widget.match.teamOne! : widget.match.teamTwo!;
+  void _checkForWin() {
+    if (widget.match.isWin) {
+      String team = (widget.match.score![0] > widget.match.score![1])
+          ? widget.match.teamOne!
+          : widget.match.teamTwo!;
       setState(() {
         buttonEnabled = false;
       });
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: Text('Victory!',style: GoogleFonts.comfortaa(fontWeight: FontWeight.w900)),
-          content: Text('Team $team won the match ${widget.match.score![0]} - ${widget.match.score![1]}'),
+          title: Text('Victory!',
+              style: GoogleFonts.comfortaa(fontWeight: FontWeight.w900)),
+          content: Text(
+              'Team $team won the match ${widget.match.score![0]} - ${widget.match.score![1]}'),
           actions: <Widget>[
             TextButton(
-              onPressed: (){
-
+              onPressed: () {
                 Navigator.pop(context, 'OK');
               },
               child: const Text('OK'),
@@ -748,32 +778,40 @@ class _MatchPageState extends State<MatchPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.only(top: 10,bottom: 20),
+                  padding: const EdgeInsets.only(top: 10, bottom: 20),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: (buttonEnabled) ? [
-                      SecondaryButton(
-                          text: '2 - 0',
-                          onTap: () {
-                            addScore(2, 0);
-                            _checkForWin();
-                            widget.match.saveMatch(widget.match).then((value) => print('saved'));
-                          }),
-                      SecondaryButton(
-                          text: '1 - 1',
-                          onTap: () {
-                            addScore(1, 1);
-                            _checkForWin();
-                            widget.match.saveMatch(widget.match).then((value) => print('saved'));
-                          }),
-                      SecondaryButton(
-                          text: '0 - 2',
-                          onTap: () {
-                            addScore(0, 2);
-                            _checkForWin();
-                            widget.match.saveMatch(widget.match).then((value) => print('saved'));
-                      })
-                    ]: [],
+                    children: (buttonEnabled)
+                        ? [
+                            SecondaryButton(
+                                text: '2 - 0',
+                                onTap: () {
+                                  addScore(2, 0);
+                                  _checkForWin();
+                                  widget.match
+                                      .saveMatch(widget.match)
+                                      .then((value) => print('saved'));
+                                }),
+                            SecondaryButton(
+                                text: '1 - 1',
+                                onTap: () {
+                                  addScore(1, 1);
+                                  _checkForWin();
+                                  widget.match
+                                      .saveMatch(widget.match)
+                                      .then((value) => print('saved'));
+                                }),
+                            SecondaryButton(
+                                text: '0 - 2',
+                                onTap: () {
+                                  addScore(0, 2);
+                                  _checkForWin();
+                                  widget.match
+                                      .saveMatch(widget.match)
+                                      .then((value) => print('saved'));
+                                })
+                          ]
+                        : [],
                   ),
                 ),
                 const Heading(text: 'History'),
@@ -792,7 +830,7 @@ class _MatchPageState extends State<MatchPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    '${widget.match.history![index*2].toString()} - ${widget.match.history![index*2 + 1].toString()}',
+                                    '${widget.match.history![index * 2].toString()} - ${widget.match.history![index * 2 + 1].toString()}',
                                     style: GoogleFonts.comfortaa(
                                         fontSize: 28,
                                         fontWeight: FontWeight.w900),
@@ -801,21 +839,20 @@ class _MatchPageState extends State<MatchPage> {
                               )
                             ],
                           );
-                })),
+                        })),
               ],
             ),
           ),
         )
       ]),
       floatingActionButton: FloatingActionButton(
-        onPressed: ((){
-          if(buttonEnabled){
+        onPressed: (() {
+          if (buttonEnabled) {
             undo();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(createInfoSnackbar(
+                'Match is closed, edditing is no longer alowed.'));
           }
-          else{
-            ScaffoldMessenger.of(context).showSnackBar(createInfoSnackbar('Match is closed, edditing is no longer alowed.'));
-          }
-          
         }),
         backgroundColor: primaryDarkColor,
         child: const Icon(Icons.undo),
@@ -891,10 +928,14 @@ class PageTitleWithBackIcon extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-                onPressed: () => onTap(), icon: const Icon(Icons.arrow_back),color: whiteColor,),
+              onPressed: () => onTap(),
+              icon: const Icon(Icons.arrow_back),
+              color: whiteColor,
+            ),
             Text(
               title,
-              style: GoogleFonts.comfortaa(fontSize: 26,fontWeight: FontWeight.w900,color: whiteColor),
+              style: GoogleFonts.comfortaa(
+                  fontSize: 26, fontWeight: FontWeight.w900, color: whiteColor),
             )
           ],
         ));
