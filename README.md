@@ -1,4 +1,4 @@
-# Ringo pocket refeee
+# Ringo pocket referee
 
 Multiplatform application to help ringo referees in their next ringo game.
 
@@ -8,4 +8,4 @@ App is available to on all major platforms
 - IOS 
 - Windows (stable and tested)
 - MacOS
-- And even Linux (currently not supported)
+- And even Linux 
